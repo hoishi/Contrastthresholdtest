@@ -1,0 +1,106 @@
+%% ContrastTest161220-4pos-UL
+load('env.mat')
+contrast = [env.lut(512) env.lut(516) env.lut(520) env.lut(524) env.lut(528) env.lut(532) ];%実験コントラスト
+%contrast = [env.lut(512) env.lut(514) env.lut(518) env.lut(520) env.lut(522) env.lut(524) env.lut(526)];%実験コントラスト
+%contrast = [64/128 ];
+orientation = [-45,45];%
+
+noiseGabor = 1; % noise IN gabor. set at 1 to see the normal Gabor%not used this experiment
+
+testPosition = [ -1.5*sqrt(2), -1.5*sqrt(2)]; 
+haploPosition = [0, 0];
+testPosition = testPosition + haploPosition;
+numTrial = 3;
+
+exp.description = '';
+exp.type = 'Constant';
+
+exp.isForcedChoice = true;  % Forced choice task の場合 true
+exp.isRtTask       = false; % Reaction time task の場合 true
+
+% Feedback
+exp.showFeedback = true;
+exp.feedbackTxt  = {'LEFT', 'RIGHT'};
+
+% Responses
+exp.response(1).code = 1;
+exp.response(1).key  = 'LeftArrow';
+exp.response(2).code = 2;
+exp.response(2).key  = 'RightArrow';
+
+% Trial time table
+exp.trialTimeTable(1).trialTime  = 0;
+exp.trialTimeTable(1).event      = 'BEGIN_TRIAL';
+exp.trialTimeTable(2).trialTime  = 0;
+exp.trialTimeTable(2).event      = 'STIM01_ONSET';
+exp.trialTimeTable(3).trialTime  = 1;
+exp.trialTimeTable(3).event      = 'STIM02_ONSET';
+exp.trialTimeTable(4).trialTime  = 1.1;
+exp.trialTimeTable(4).event      = 'STIM01_OFFSET';
+exp.trialTimeTable(5).trialTime  = 1.1;
+exp.trialTimeTable(5).event      = 'STIM02_OFFSET';
+exp.trialTimeTable(6).trialTime  = 1.1;
+exp.trialTimeTable(6).event      = 'STIM03_ONSET';
+exp.trialTimeTable(7).trialTime  = 1.6;
+exp.trialTimeTable(7).event      = 'RESPONSE_ONSET';
+exp.trialTimeTable(8).trialTime  = 1.6;
+exp.trialTimeTable(8).event      = 'STIM03_OFFSET';
+exp.trialTimeTable(9).trialTime  = 1.6;
+exp.trialTimeTable(9).event      = 'STIM04_ONSET';
+exp.trialTimeTable(10).trialTime  = 2.6;
+exp.trialTimeTable(10).event      = 'STIM04_OFFSET';
+exp.trialTimeTable(11).trialTime  = 2.6;
+exp.trialTimeTable(11).event      = 'RESPONSE_OFFSET';
+exp.trialTimeTable(12).trialTime  = 2.6;
+exp.trialTimeTable(12).event      = 'END_TRIAL';
+
+% Trial sequence
+c = 1;
+for n = 1:length(contrast)
+for m = 1:length(orientation)
+    exp.trial(c).flipFreq = 60;
+    exp.trial(c).stim(1).type = 'FixationCross';
+    exp.trial(c).stim(1).drawFunc = @DrawFixationPoint;
+    exp.trial(c).stim(1).parameters.position = haploPosition;
+    exp.trial(c).stim(1).parameters.length   = 0.3;
+    exp.trial(c).stim(1).parameters.width    = 0.05;
+    exp.trial(c).stim(1).parameters.color    = [env.lut(1024), env.lut(1024), env.lut(1024)];
+    exp.trial(c).stim(1).parameters.stimFreq       = 0.1;
+
+    exp.trial(c).stim(2).type = 'GaborPatch';
+    exp.trial(c).stim(2).drawFunc = @DrawContrastStim;
+    exp.trial(c).stim(2).parameters.patchShape     = 'Circle';
+    exp.trial(c).stim(2).parameters.gabor_Size      = [ 4 ];%後でpxelに直す
+    exp.trial(c).stim(2).parameters.stimPos        = testPosition;
+    exp.trial(c).stim(2).parameters.contrast      = [ contrast(n)];
+    exp.trial(c).stim(2).parameters.orientation      = [ orientation(m)];
+    exp.trial(c).stim(2).parameters.gaborPhase = 0;%ピクセルに直す
+    exp.trial(c).stim(2).parameters.numCycles = 3;%cycles/degree(pixel)%縞模様の細かさ
+    exp.trial(c).stim(2).parameters.aperture = 0.8;%SD gaussian
+%   exp.trial(c).stim(2).parameters.correlation    = [ 1, 1 ];
+%   exp.trial(c).stim(2).parameters.coherence      = [ 1, 1 ];
+    exp.trial(c).stim(2).parameters.stimFreq       = 0.1;
+
+    exp.trial(c).flipFreq = 60;
+    exp.trial(c).stim(3).type = 'FixationCross';
+    exp.trial(c).stim(3).drawFunc = @DrawFixationPoint;
+    exp.trial(c).stim(3).parameters.position = haploPosition;
+    exp.trial(c).stim(3).parameters.length   = 0.3;
+    exp.trial(c).stim(3).parameters.width    = 0.05;
+    exp.trial(c).stim(3).parameters.color    = [env.lut(1), env.lut(1), env.lut(1)];
+    exp.trial(c).stim(3).parameters.stimFreq       = 0.1;
+
+    exp.trial(c).flipFreq = 60;
+    exp.trial(c).stim(4).type = 'FixationCross';
+    exp.trial(c).stim(4).drawFunc = @DrawFixationPoint;
+    exp.trial(c).stim(4).parameters.position = haploPosition;
+    exp.trial(c).stim(4).parameters.length   = 0.3;
+    exp.trial(c).stim(4).parameters.width    = 0.05;
+    exp.trial(c).stim(4).parameters.color    = [env.lut(1), env.lut(1), env.lut(1)];
+    exp.trial(c).stim(4).parameters.stimFreq       = 0.1;
+    c = c + 1;
+end
+end
+
+exp.trial = repmat(exp.trial, 1, numTrial);
+exp.trial = Shuffle(exp.trial);

@@ -1,0 +1,98 @@
+% DemoCMF
+testContrast    = [ 0.1 0.5 1 ];
+testSpatialFreq = [ 0.5 1 2 ];
+testDisparity = [ -0.16, -0.08, -0.04, -0.02, -0.01, ...
+                   0.16,  0.08,  0.04,  0.02,  0.01 ];
+
+numTrial = 10;
+
+exp.description = 'Demo experiment to measure contrast modulation function';
+
+exp.type = 'Constant';
+
+exp.isForcedChoice = true;
+exp.isRtTask       = false;
+
+% Feedback
+exp.showFeedback = true;
+exp.feedbackTxt  = {'YES', 'NO'};
+
+% Responses
+exp.response(1).code = 1;
+exp.response(1).key  = 'f';
+exp.response(2).code = 2;
+exp.response(2).key  = 'j';
+
+% Trial time table
+exp.trialTimeTable(1).trialTime  = 0;
+exp.trialTimeTable(1).event      = 'BEGIN_TRIAL';
+exp.trialTimeTable(2).trialTime  = 0;
+exp.trialTimeTable(2).event      = 'STIM01_ONSET';
+exp.trialTimeTable(3).trialTime  = 1.5;
+exp.trialTimeTable(3).event      = 'STIM01_OFFSET';
+exp.trialTimeTable(4).trialTime  = 1;
+exp.trialTimeTable(4).event      = 'STIM02_ONSET';
+exp.trialTimeTable(5).trialTime  = 1.5;
+exp.trialTimeTable(5).event      = 'STIM02_OFFSET';
+exp.trialTimeTable(6).trialTime  = 1.5;
+exp.trialTimeTable(6).event      = 'RESPONSE_ONSET';
+exp.trialTimeTable(7).trialTime  = 2.5;
+exp.trialTimeTable(7).event      = 'RESPONSE_OFFSET';
+exp.trialTimeTable(8).trialTime  = 2.5;
+exp.trialTimeTable(8).event      = 'END_TRIAL';
+
+% Trial sequence
+c = 1;
+for n = 1:length(testContrast)
+for m = 1:length(testSpatialFreq)
+    exp.trial(c).stim(1).type = 'FixationCross';
+    exp.trial(c).stim(1).drawFunc = @DrawFixationPointWithRDS;
+    exp.trial(c).stim(1).parameters.position = [ 0, 0 ];
+    exp.trial(c).stim(1).parameters.length   = 0.3;
+    exp.trial(c).stim(1).parameters.width    = 0.05;
+    exp.trial(c).stim(1).parameters.color    = [1, 1, 1];
+    exp.trial(c).stim(1).parameters.stimFreq       = 1;
+    exp.trial(c).stim(1).parameters.dotSize        = 0.16;
+    exp.trial(c).stim(1).parameters.dotDensity     = 0.1;
+    exp.trial(c).stim(1).parameters.brightDotColor = [ 1, 1, 1 ];
+    exp.trial(c).stim(1).parameters.darkDotColor   = [ 0, 0, 0 ];
+    exp.trial(c).stim(1).parameters.patchShape     = 'Bipartite_Circle';
+    exp.trial(c).stim(1).parameters.patchSize      = [ 2, 0 ];
+    exp.trial(c).stim(1).parameters.stimPos        = [ 0, 0 ];
+    exp.trial(c).stim(1).parameters.disparity      = [ 0, 0 ];
+    exp.trial(c).stim(1).parameters.correlation    = [ 1, 1 ];
+    exp.trial(c).stim(1).parameters.coherence      = [ 1, 1 ];
+    exp.trial(c).stim(1).parameters.stimFreq       = 0.1;
+
+    exp.trial(c).stim(2).drawFunc = @DrawRandomDotStereogram;
+    exp.trial(c).stim(2).parameters.dotSize        = 0.16;
+    exp.trial(c).stim(2).parameters.dotDensity     = 0.25;
+    exp.trial(c).stim(2).parameters.brightDotColor = [ 1, 1, 1 ];
+    exp.trial(c).stim(2).parameters.darkDotColor   = [ 0, 0, 0 ];
+    exp.trial(c).stim(2).parameters.patchShape     = 'Bipartite_Circle';
+    exp.trial(c).stim(2).parameters.patchSize      = [ 4, 5 ];
+    exp.trial(c).stim(2).parameters.stimPos        = [ 0, 6 ];
+    exp.trial(c).stim(2).parameters.disparity      = [ testDisparity(n), 0 ];
+    exp.trial(c).stim(2).parameters.correlation    = [ 1, 1 ];
+    exp.trial(c).stim(2).parameters.coherence      = [ 1, 1 ];
+    exp.trial(c).stim(2).parameters.stimFreq       = 10.625;
+
+%    exp.trial(c).stim(2).type = 'SineWaveGrating';
+%    exp.trial(c).stim(2).drawFunc = @DrawSinWaveGrating;
+%    exp.trial(c).stim(2).parameters.patchShape     = 'Circle';
+%    exp.trial(c).stim(2).parameters.patchSize      = 4;
+%    exp.trial(c).stim(2).parameters.patchPosition  = [ 0, 0 ];
+%    exp.trial(c).stim(2).parameters.contrast       = 1;
+%    exp.trial(c).stim(2).parameters.orientation    = 0;
+%    exp.trial(c).stim(2).parameters.spatialFreq    = 1; % [cycle/deg]
+%    exp.trial(c).stim(2).parameters.driftingDirq   = 0;
+%    exp.trial(c).stim(2).parameters.temporalFreq   = 1; % [cycle/deg]
+
+    c = c + 1;
+end
+end
+
+exp.trial = repmat(exp.trial, 1, numTrial);
+
+exp.trial = Shuffle(exp.trial);
+
